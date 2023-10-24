@@ -3,8 +3,11 @@ import {db} from "../config/firebase";
 import { getAuth } from "firebase/auth";
 import {getDoc, doc, updateDoc, setDoc} from "firebase/firestore";
 import {View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const OrderHistory = () =>{
+
+    const navigation = useNavigation();
 
     const auth = getAuth();
     const user = auth.currentUser;
@@ -93,10 +96,42 @@ const OrderHistory = () =>{
                             </Text>
                         </View>
                     ))}
+
+            {Array.isArray(orders.drinks) && orders.drinks.map((drink, index) => (
+                        <View key={`drink-${index}`} style={styles.items_div}>
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Drinks {index + 1}: <Text style={styles.details}>{drink.name}</Text></Text>
+                            </Text>
+                            
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Price: </Text>
+                            R {drink.price}
+                            </Text>
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Quantity:</Text>{drink.quantity}
+                            </Text>
+                        </View>
+                    ))}
+
+            {Array.isArray(orders.main) && orders.main.map((item, index) => (
+                        <View key={`item-${index}`} style={styles.items_div}>
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Item {index + 1}: <Text style={styles.details}>{item.name}</Text></Text>
+                            </Text>
+                            
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Price: </Text>
+                            R {item.price}
+                            </Text>
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Quantity:</Text>{item.quantity}
+                            </Text>
+                        </View>
+                    ))}
                      </View>
             </ScrollView>
 
-            <TouchableOpacity style={styles.btn_history}>
+            <TouchableOpacity style={styles.btn_history} onPress={() => navigation.navigate("Menu")}>
                 <Text style={styles.btn_history_text}>Back To Main Menu</Text>
             </TouchableOpacity>
         </View>

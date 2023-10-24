@@ -82,13 +82,13 @@ const SignUp = () => {
                 <Text style={styles.japanese}>to join the community and enjoy life</Text>
             </View>
 
-            <View>
-                <TouchableOpacity style={styles.google_btn}>
+            <View style={{marginTop: "10%"}}>
+                {/*<TouchableOpacity style={styles.google_btn}>
                     <Image source={require("../images/icons/google.png")} style={styles.google_icon} />
                     <Text style={styles.google_text}>Google</Text>
                 </TouchableOpacity>
 
-                <Text style={styles.or}>____________________  or  ___________________</Text>
+    <Text style={styles.or}>____________________  or  ___________________</Text>*/}
 
                 <TextInput style={styles.input} 
                             placeholder="Full Name" 

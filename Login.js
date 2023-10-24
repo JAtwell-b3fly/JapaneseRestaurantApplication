@@ -26,18 +26,18 @@ const Login = () => {
         <View style={styles.main}>
             <Image source={require("../images/profile-images/logo.jpg")} style={styles.logo} resizeMode="cover" />
 
-            <View>
+            <View style={{marginBottom: "10%"}}>
                 <Text style={styles.screen_name}>LOGIN</Text>
                 <Text style={styles.japanese}>to join the community and enjoy life</Text>
             </View>
 
             <View>
-                <TouchableOpacity style={styles.google_btn}>
+               {/*} <TouchableOpacity style={styles.google_btn}>
                     <Image source={require("../images/icons/google.png")} style={styles.google_icon} />
                     <Text style={styles.google_text}>Google</Text>
                 </TouchableOpacity>
 
-                <Text style={styles.or}>____________________  or  ___________________</Text>
+    <Text style={styles.or}>____________________  or  ___________________</Text>*/}
 
                 <TextInput style={styles.input} placeholder="E-Mail" value={email} onChangeText={(text) => setEmail(text)} />
                 <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={(text) => setPassword(text)} />

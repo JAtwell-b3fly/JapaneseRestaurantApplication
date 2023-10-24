@@ -2,7 +2,7 @@ import {React, useState, useEffect} from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
-import {getDoc, doc, updateDoc, addDoc} from "firebase/firestore";
+import {getDoc, doc, updateDoc, addDoc, setDoc} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import {db} from "../config/firebase";
 import { useAppContext } from "./AppNavigation";
@@ -92,7 +92,7 @@ const OrderDetails = () => {
                 const userUID = user.uid;
                 const userDocRef = doc(db, "orders", userUID);
 
-                await addDoc(userDocRef, {
+                await setDoc(userDocRef, {
                     reservations: reservations,
                     order: orders,
                     orderDate: getTodaysDate(),

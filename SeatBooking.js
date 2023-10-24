@@ -55,7 +55,7 @@ const SeatBooking = () => {
         <View style={styles.main}>
 
             <View style={styles.top_btn_div}>
-                <TouchableOpacity style={styles.delivery_btn} onPress={() => navigation.navigate("OrderCart")}>
+            <TouchableOpacity style={styles.delivery_btn} onPress={() => navigation.navigate("OrderCart", {userId})}>
                     <Text style={styles.top_btn_text}>Order Delivery</Text>
                 </TouchableOpacity>
 
