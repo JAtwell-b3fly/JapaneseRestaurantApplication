@@ -2,7 +2,7 @@ import {React, useState} from "react";
 import { View, Image, StyleSheet, Text, TouchableOpacity, ScrollView, TextInput, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import {db} from "../config/firebase";
-import {doc, setDoc} from "firebase/firestore";
+import {doc, setDoc, addDoc} from "firebase/firestore";
 import { useRoute } from "@react-navigation/native";
 import { Picker } from "@react-native-picker/picker";
 import { getAuth } from "firebase/auth";
@@ -69,15 +69,10 @@ const Reservation = () => {
     
                 return `${day}/${month}/${year}`;
             }
+            
+                const userDocRef = doc(db, "reservations");
 
-            console.log("userId", userId);
-
-            //Check if user is not null before accessing uid
-            if (user) {
-                const userUID = user.uid;
-                const userDocRef = doc(db, "reservations", userUID);
-
-                await setDoc(userDocRef, {
+                await addDoc(userDocRef, {
                     Name: name,
                     Email: email,
                     Phone_Number: cellNumber,
@@ -88,14 +83,13 @@ const Reservation = () => {
                     AgreeToTerms: isChecked,
                     reservationMade: getTodaysDate(),
                     Table: selectedTable,
+                    userId : userUID,
                 })
 
                 //Inform the user that information is added to the database
                 Alert.alert("Added To Cart");
                 navigation.navigate("OrderDetails", {userId: userUID})
-            } else {
-                console.error("User Not Found");
-            }
+           
            
     } catch (error) {
         console.error(error.message);
@@ -140,17 +134,9 @@ const Reservation = () => {
 
             <ScrollView style={{flex: 1, marginTop: 25,}}>
             <View style={styles.seating_arrangements}>
-                <View style={styles.first_row}>
-                    <TextInput style={styles.input1} placeholder="Full Name" value={name} onChangeText={(text) => setName(text)}></TextInput>
-                </View>
-
-                <View style={styles.second_row}>
-                    <TextInput style={styles.input2} placeholder={userEmail} value={email} onChangeText={(text) => setEmail(text)}></TextInput>
-                    <TextInput style={styles.input3} placeholder="Phone Number" value={cellNumber} keyboardType = "numeric" maxLength = {10} onChangeText={(text) => setCellNumber(text)}></TextInput>
-                    
-                </View>
 
                 <View style={styles.third_row}>
+
                     <TextInput style={styles.input4} placeholder="Date: (dd/mm/yyyy)" value={date} onChangeText={(text) => setDate(text)}></TextInput>
 
                     <TextInput style={styles.input5} placeholder="Number of Guests" value={numberOfGuests} keyboardType = "numeric" onChangeText={(text) => setNumberOfGuests(text)}></TextInput>
@@ -192,10 +178,10 @@ const Reservation = () => {
                         </Text>
                     </TouchableOpacity>
                     {!showTerms && (
-                        <ScrollView style={{ height: 130, marginTop: 10, blackgroundColor: "black"}} />
+                        <ScrollView style={{ height: 260, marginTop: 10, blackgroundColor: "black"}} />
                     )}
                     {showTerms && (
-                        <ScrollView style={{ maxHeight: 130, marginTop: 10}}>
+                        <ScrollView style={{ maxHeight: 260, marginTop: 10, height: 260}}>
                             <Text style={styles.terms_conditions}>
                             Reservation Terms and Conditions
 
@@ -283,7 +269,7 @@ const styles = StyleSheet.create({
         height: 70,
         borderRadius: 30,
         marginLeft: 10,
-        flexDirection: "row"
+        flexDirection: "row",
     },
     nav_btn_image: {
         width: 50,

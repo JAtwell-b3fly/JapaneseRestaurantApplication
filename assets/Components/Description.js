@@ -15,6 +15,9 @@ const Description = () => {
     //Get the last dish that was added to the array
     const lastDish = dishData[dishData.length - 1];
 
+    //Get the last drink that was added to the array
+    const lastDrink = selectedDrinks[selectedDrinks.length - 1];
+
     useEffect(() => {
         console.log("Component re-rendered with updated dishData:", dishData);
       }, [dishData]);

@@ -19,7 +19,11 @@ const Menu = () => {
     const {dispatch, selectedCondiments, selectedDrinks, dishData} = useAppContext();
 
     const SelectedItemPress = (selectedItem) => {
-        dispatch({type: "ADD_DISH", payload: selectedItem});
+        if (selectedItem.type === "drinks") {
+            dispatch({ type: "ADD_DRINK", payload: selectedItem})
+        } else {
+            dispatch({type: "ADD_DISH", payload: selectedItem});
+        }
         navigation.navigate("Description", {
             dishData,
             userId,
@@ -44,6 +48,20 @@ const Menu = () => {
     const [alls, setAlls] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [menuPending, setMenuPending] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [searchedItem, setSearchedItem] = useState([]);
+
+    useEffect(() => {
+        const filteredData = alls.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        setSearchedItem(filteredData);
+    }, [searchTerm, alls])
+
+    const handleSearch = (searchTerm) => {
+        //const filteredData = alls.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        setSearchedItem(filteredData);
+    }
 
     const handleCategorySelect = (category) => {
         setSelectedCategory(category);
@@ -214,12 +232,12 @@ const Menu = () => {
         <View style={styles.main}>
 
             <View style={styles.search_div}>
-                <TextInput placeholder="Search your dish..." placeholderTextColor="white" style={styles.search} />
+                <TextInput placeholder="Search your dish..." placeholderTextColor="white" style={styles.search} value={searchTerm} onChangeText={(text) => setSearchTerm(text)} />
             </View>
 
-            <View style={styles.search_icon_div}>
+            <TouchableOpacity style={styles.search_icon_div} onPress={(searchTerm) => handleSearch(searchTerm)}>
                 <Image style={styles.search_icon} source={require("../images/icons/search.png")} />
-            </View>
+            </TouchableOpacity>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View style={styles.category}>
@@ -252,6 +270,32 @@ const Menu = () => {
             </ScrollView>
            
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+
+            {searchTerm.length > 0 && (
+                <View style={styles.dishes}>
+                {searchedItem.map((item) => (
+                    <View key ={item.id} style={styles.item_box}>
+                    <Image source={{ uri: item.image}} style={styles.dish} />
+    
+                    <Text style={styles.dish_name}>{item.name}</Text>
+    
+                    <TouchableOpacity style={styles.new_btn}>
+                        <Text style={styles.category_text}>New</Text>
+                    </TouchableOpacity>
+    
+                    <View style={styles.description_container}>
+                        <ScrollView style={{maxHeight: 120}}>
+                            <Text style={styles.description}>{item.description}</Text>
+                        </ScrollView>
+    
+                    <TouchableOpacity key={item.id} style={styles.btn_price} onPress={() => SelectedItemPress(item)}>
+                        <Text style={styles.price_text}>R {item.price}</Text>
+                    </TouchableOpacity>
+                    </View>
+                </View>
+                ))}
+                 </View>
+            )}
 
             {selectedCategory === "All" && (
                     <View style={styles.dishes}>
@@ -528,6 +572,7 @@ const styles = StyleSheet.create({
         width: 300,
         padding: 6,
         borderRadius: 20,
+        color: "white",
     },
     search_div: {
         marginTop: 30,

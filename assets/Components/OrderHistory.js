@@ -1,24 +1,43 @@
 import {React, useEffect, useState} from "react";
 import {db} from "../config/firebase";
 import { getAuth } from "firebase/auth";
-import {getDoc, doc, updateDoc, setDoc} from "firebase/firestore";
+import {getDoc, doc, where, query} from "firebase/firestore";
 import {View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const OrderHistory = () =>{
 
+    const navigation = useNavigation();
+
     const auth = getAuth();
     const user = auth.currentUser;
+    const userUID = user.uid;
     const [orders, setOrders] = useState([]);
+
+    const [searchTerm, setSearchTerm] = useState("");
+    const [searchedItem, setSearchedItem] = useState([]);
+
+    const handleSearch = (searchTerm) => {
+        //const filteredData = alls.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        setSearchedItem(filteredData);
+    }
+
+    useEffect(() => {
+        //const filteredData = orders.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        setSearchedItem(filteredData);
+    }, [searchTerm, orders])
 
     useEffect(() => {
         pullOrderHistoryData();
-        console.log("Order History: ", orders)
+        console.log("Order History: ", orders, userUID);
     }, []);
 
     const pullOrderHistoryData = async() => {
         if (user) {
             try{
-                const userDocRef = doc(db, "orders", user.uid);
+                const userDocRef = doc(db, "orders");
                 const docSnap = await getDoc(userDocRef);
 
                 if (docSnap.exists()) {
@@ -47,15 +66,46 @@ const OrderHistory = () =>{
             </View>
 
             <View style={styles.search_div}>
-                <TextInput placeholder="Search by OrderNumber..." placeholderTextColor="white" style={styles.search} />
+                <TextInput placeholder="Search by OrderNumber..." placeholderTextColor="white" style={styles.search} value={searchTerm} onChangeText={(text) => setSearchTerm(text)} />
             </View>
+
+            <TouchableOpacity style={styles.search_icon_div} onPress={(searchTerm) => handleSearch(searchTerm)}>
+                <Image style={styles.search_icon} source={require("../images/icons/search.png")} />
+            </TouchableOpacity>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View style={styles.dishes}>
                     <Text key={orders.id} style={styles.details}>
-                                <Text style={styles.header}>Order Number: </Text>
+                        <Text style={styles.header}>Order Number: </Text>
                             R {orders.orderNumber}
-                            </Text>
+                    </Text>
+
+                {searchTerm.length > 0 && (
+                <View style={styles.dishes}>
+                {searchedItem.map((item) => (
+                    <View key ={item.id} style={styles.item_box}>
+                    <Image source={{ uri: item.image}} style={styles.dish} />
+    
+                    <Text style={styles.dish_name}>{item.name}</Text>
+    
+                    <TouchableOpacity style={styles.new_btn}>
+                        <Text style={styles.category_text}>New</Text>
+                    </TouchableOpacity>
+    
+                    <View style={styles.description_container}>
+                        <ScrollView style={{maxHeight: 120}}>
+                            <Text style={styles.description}>{item.description}</Text>
+                        </ScrollView>
+    
+                    <TouchableOpacity key={item.id} style={styles.btn_price} onPress={() => SelectedItemPress(item)}>
+                        <Text style={styles.price_text}>R {item.price}</Text>
+                    </TouchableOpacity>
+                    </View>
+                </View>
+                ))}
+                 </View>
+            )}
+
                   {/*  {orders.map((order) => (
                         <View key ={order.id} style={styles.item_box}>
                         <Image source={{ uri: order.image}} style={styles.dish} />
@@ -93,10 +143,42 @@ const OrderHistory = () =>{
                             </Text>
                         </View>
                     ))}
+
+            {Array.isArray(orders.drinks) && orders.drinks.map((drink, index) => (
+                        <View key={`drink-${index}`} style={styles.items_div}>
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Drinks {index + 1}: <Text style={styles.details}>{drink.name}</Text></Text>
+                            </Text>
+                            
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Price: </Text>
+                            R {drink.price}
+                            </Text>
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Quantity:</Text>{drink.quantity}
+                            </Text>
+                        </View>
+                    ))}
+
+            {Array.isArray(orders.main) && orders.main.map((item, index) => (
+                        <View key={`item-${index}`} style={styles.items_div}>
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Item {index + 1}: <Text style={styles.details}>{item.name}</Text></Text>
+                            </Text>
+                            
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Price: </Text>
+                            R {item.price}
+                            </Text>
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Quantity:</Text>{item.quantity}
+                            </Text>
+                        </View>
+                    ))}
                      </View>
             </ScrollView>
 
-            <TouchableOpacity style={styles.btn_history}>
+            <TouchableOpacity style={styles.btn_history} onPress={() => navigation.navigate("Menu")}>
                 <Text style={styles.btn_history_text}>Back To Main Menu</Text>
             </TouchableOpacity>
         </View>
@@ -162,6 +244,7 @@ const styles = StyleSheet.create({
         width: 300,
         padding: 6,
         borderRadius: 20,
+        color: "white",
     },
     search_div: {
         marginLeft: 20,
@@ -305,6 +388,31 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginBottom: 10,
       },
+      search_div: {
+        marginTop: 30,
+        marginLeft: 20,
+        marginBottom: 15,
+    },
+    search_icon: {
+        width:35,
+        height:35,
+       
+        position: "relative",
+    },
+    search_icon_div: {
+        position: "absolute",
+        zIndex: 1,
+        top: 130,
+        left: 340,
+        width: 50,
+        height: 50,
+        backgroundColor: "white",
+        borderRadius: 50,
+        borderStyle: "solid",
+        borderWidth: 3,
+        borderColor: "orange",
+        padding: 5,
+    },
 });
 
 export default OrderHistory;

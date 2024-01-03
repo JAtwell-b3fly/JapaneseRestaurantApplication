@@ -2,7 +2,7 @@ import {React, useState, useEffect} from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
-import {getDoc, doc, updateDoc, addDoc} from "firebase/firestore";
+import {getDoc, doc, updateDoc, addDoc, setDoc, collection} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import {db} from "../config/firebase";
 import { useAppContext } from "./AppNavigation";
@@ -12,7 +12,7 @@ const OrderDetails = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const {userId} = route.params;
-    const {dispatch} = useAppContext()
+    const {state, dispatch} = useAppContext()
 
     const auth = getAuth();
     const user = auth.currentUser;
@@ -73,7 +73,6 @@ const OrderDetails = () => {
 
     //Update the Cart and Sent the Final Order through to Firebase
     const confirmedOrder = async() => {
-
         //Push Final Order to Firebase
         try{
 
@@ -89,15 +88,16 @@ const OrderDetails = () => {
 
             //Check if user is not null before accessing uid
             if (user) {
-                const userUID = user.uid;
-                const userDocRef = doc(db, "orders", userUID);
+                const ordersCollectionRef = collection(db, "orders");
+                //const newOrderDocRef = doc(ordersCollectionRef);
 
-                await addDoc(userDocRef, {
-                    reservations: reservations,
-                    order: orders,
-                    orderDate: getTodaysDate(),
-                    orderNumber: CustomerOrderNumber,
-                })
+                await addDoc(ordersCollectionRef, {
+                reservations: reservations,
+                order: orders,
+                orderDate: getTodaysDate(),
+                orderNumber: CustomerOrderNumber,
+                userId: user.uid,
+})
 
                 //Inform the user that information is added to the database
                 Alert.alert("Added To Cart");
@@ -135,11 +135,13 @@ const OrderDetails = () => {
                 console.error(error.message);
             };
 
-            /*try {
+            try {
+                console.log("State before reset: ", state)
                 dispatch({ type: "RESET_COLLECTIONS"});
+                console.log("State after reset: ", state)
             } catch (error) {
-                console.error("Error in resetting Cart")
-            } */
+                console.error("Error in resetting Cart Using Global States", error)
+            } 
     };
 
 

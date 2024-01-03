@@ -91,6 +91,7 @@ const appReducer = (state, action) => {
         case "REMOVE_DISH":
             return {...state, dishData: state.dishData.filter((dish) => !(dish.id === action.payload.id && dish.quantity <= 1 ))};
         case "RESET_COLLECTIONS":
+            console.log("Resetting collections");
             return {...state, selectedCondiments: [], selectedDrinks: [], dishData: []};
         default:
             return state;
@@ -119,7 +120,7 @@ const AppNavigation = () => {
     return(
         <AppProvider>
         <NavigationContainer>
-            <Stack.Navigator initialRouteName = "Login" screenOptions={{headerShown: false, ...TransitionPresets.SlideFromRightIOS}}>
+            <Stack.Navigator initialRouteName = "Splash" screenOptions={{headerShown: false, ...TransitionPresets.SlideFromRightIOS}}>
                 <Stack.Screen 
                                 name="Splash"
                                 component={Splash} 
