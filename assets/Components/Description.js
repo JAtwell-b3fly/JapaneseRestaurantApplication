@@ -1,4 +1,4 @@
-import {React, useEffect} from "react";
+import React, {useEffect} from "react";
 import { View, Image, StyleSheet, Text, TouchableOpacity, ScrollView} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useAppContext } from "./AppNavigation";
@@ -9,25 +9,28 @@ const Description = () => {
     const navigation = useNavigation();
     const {dishData, selectedCondiments, selectedDrinks} = useAppContext();
     const route = useRoute();
-    const {userId} = route.params;
+    const {userId, lastSelectedType} = route.params;
 
+    // Determine the correct array based on the lastSelectedType
+    const selectedArray = lastSelectedType === "drinks" ? selectedDrinks : dishData;
 
-    //Get the last dish that was added to the array
-    const lastDish = dishData[dishData.length - 1];
+    // Get the last selected item based on its type
+    const lastSelectedItem = selectedArray[selectedArray.length - 1];
 
-    //Get the last drink that was added to the array
-    const lastDrink = selectedDrinks[selectedDrinks.length - 1];
-
-    useEffect(() => {
-        console.log("Component re-rendered with updated dishData:", dishData);
-      }, [dishData]);
+    useEffect (() => {
+        console.log("Component re-rendered with updated lastSelectedItem: ", lastSelectedItem)
+    }, [lastSelectedItem]);
 
     const handleCondimentPress = () => {
-        navigation.navigate("Condiments", {userId, dishData, selectedCondiments, selectedDrinks})
+        if (lastSelectedType === "dish") {
+            navigation.navigate("Condiments", {userId, dishData, selectedCondiments, selectedDrinks})
+        } else if (lastSelectedType === "drinks") {
+            navigation.navigate("OrderCart", {userId, dishData, selectedCondiments, selectedDrinks})
+        }
     }
 
     const handleBackMenuPress = () => {
-        navigation.navigate("Menu", {userId});
+        navigation.navigate("Menu", {userId, dishData, selectedCondiments, selectedDrinks});
     }
 
     return(
@@ -38,38 +41,39 @@ const Description = () => {
                     <Image style={styles.back_image} source={require("../images/icons/arrow-left-black.png")} />
                 </TouchableOpacity>
 
-                <Image source={{uri: lastDish.image}} style={styles.dish} resizeMode="cover" />
+                <Image source={{uri: lastSelectedItem.image}} style={styles.dish} resizeMode="cover" />
 
-                <Text style={styles.screen_name}>{lastDish.name}</Text>
+                <Text style={styles.screen_name}>{lastSelectedItem.name}</Text>
             </View>
 
             <View>
                 <ScrollView style={{ maxHeight: 190}}>
-                    <Text style={styles.description}>{lastDish.description}</Text>
-                    <Text style={styles.description}>{lastDish.ingredients}</Text>
+                    <Text style={styles.description}>{lastSelectedItem.description}</Text>
+                    <Text style={styles.description}>{lastSelectedItem.ingredients}</Text>
                 </ScrollView>
                 
-                <Text style={styles.price}>R {lastDish.price}</Text>
+                <Text style={styles.price}>R {lastSelectedItem.price}</Text>
 
-                <TouchableOpacity style={styles.btn_condiments} onPress={() => handleCondimentPress(dishData)}>
+
+                <TouchableOpacity style={styles.btn_condiments} onPress={() => handleCondimentPress(lastSelectedItem)}>
                     <Text style={styles.btn_condiments_text}>Add Condiments</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btn_cart} onPress={() => handleCondimentPress(dishData)}>
+                <TouchableOpacity style={styles.btn_cart} onPress={() => handleCondimentPress(lastSelectedItem)}>
                     <Text style={styles.btn_cart_text}>Add To Cart</Text>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.nav_box}>
-                <TouchableOpacity style={styles.nav_btn} onPress={() => handleBackMenuPress(dishData)}>
+                <TouchableOpacity style={styles.nav_btn} onPress={() => handleBackMenuPress()}>
                     <Image source={require("../images/icons/rice-bowl-colour.png")} style={styles.nav_btn_image} />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.nav_btn} onPress={() => navigation.navigate("RestaurantCart")}>
+                <TouchableOpacity style={styles.nav_btn} onPress={() => navigation.navigate("RestaurantCart", {userId, dishData, selectedCondiments, selectedDrinks})}>
                     <Image source={require("../images/icons/diamonds.png")} style={styles.nav_btn_image} />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.nav_btn} onPress={() => navigation.navigate("OrderCart")}>
+                <TouchableOpacity style={styles.nav_btn} onPress={() => navigation.navigate("OrderCart", {userId, dishData, selectedCondiments, selectedDrinks})}>
                     <Image source={require("../images/icons/shopping-cart.png")} style={styles.nav_btn_image} />
                 </TouchableOpacity>
 
@@ -112,7 +116,7 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 26,
         fontWeight: "bold",
-        textAlign: "left",
+        textAlign: "center",
         width: 350,
         marginLeft: 35,
         marginBottom: 10,
@@ -160,7 +164,7 @@ const styles = StyleSheet.create({
         padding: 8,
         marginLeft: 80,
         marginTop: 10,
-        marginBottom: 15,
+        marginBottom: 10,
     },
     btn_condiments_text: {
         color: "white",

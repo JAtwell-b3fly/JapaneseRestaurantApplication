@@ -131,8 +131,8 @@ const OrderCart = () => {
                     main: dishData,
                     condiments: selectedCondiments,
                     drinks: selectedDrinks,
-                    customer: userUID,
                     orderPrice: orderPrice,
+                    orderType: "takeAway",
                 })
 
                 //Inform the user that information is added to the database
@@ -164,7 +164,7 @@ const OrderCart = () => {
             <ScrollView style={styles.scroll_div}>
         
                    <View>
-                        <Text style={styles.categoryTitle}>Item</Text>
+                        {dishData.length > 0 && (<Text style={styles.categoryTitle}>Item</Text>)}
                         {dishData.map((dish, index) => (
                             <View key={index} style={styles.single_condiment}>
                             <Image source={{uri : dish.image}} style={styles.condiment_img} />
@@ -197,7 +197,7 @@ const OrderCart = () => {
                     </View> 
 
                     <View>
-                        <Text style={styles.categoryTitle}>Condiments</Text>
+                        {selectedCondiments.length > 0 && (<Text style={styles.categoryTitle}>Condiments</Text>)}
                         {selectedCondiments.map((condiment, index) => (
                             <View key={index} style={styles.single_condiment}>
                             <Image source={{uri : condiment.image}} style={styles.condiment_img} />
@@ -230,7 +230,7 @@ const OrderCart = () => {
                     </View>
 
                     <View>
-                        <Text style={styles.categoryTitle}>Drinks</Text>
+                        {selectedDrinks.length > 0 && (<Text style={styles.categoryTitle}>Drinks</Text>)}
                         {selectedDrinks.map((drink, index) => (
                             <View key={index} style={styles.single_condiment}>
                             <Image source={{uri : drink.image}} style={styles.condiment_img} />

@@ -1,8 +1,8 @@
-import {React, useState} from "react";
+import {React, useState, useEffect} from "react";
 import { View, Image, StyleSheet, Text, TouchableOpacity, ScrollView, TextInput, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import {db} from "../config/firebase";
-import {doc, setDoc, addDoc} from "firebase/firestore";
+import {doc, setDoc, addDoc, getDoc} from "firebase/firestore";
 import { useRoute } from "@react-navigation/native";
 import { Picker } from "@react-native-picker/picker";
 import { getAuth } from "firebase/auth";
@@ -13,23 +13,50 @@ const Reservation = () => {
     const route = useRoute();
     const { 
         userId, 
-        selectedTable } = route.params;
+        selectedTable,
+        docRef } = route.params;
 
     const auth = getAuth();
     const user = auth.currentUser;
-    const userEmail = user.email;
 
     //variables
     const [isChecked, setIsChecked] = useState(false);
     const [showTerms, setShowTerms] = useState(false);
 
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("" || userEmail);
-    const [cellNumber, setCellNumber] = useState("");
+    const [userInfo, setUserInfo] = useState([]);
+    const [name, setName] = useState(userInfo.fullName);
+    const [email, setEmail] = useState(userInfo.email);
+    const [cellNumber, setCellNumber] = useState(userInfo.number);
     const [date, setDate] = useState("");
     const [numberOfGuests, setNumberOfGuests] = useState("");
     const [specialRequests, setSpecialRequests] = useState("");
     const [occassion, setOccassion] = useState("Casual Dining");
+
+    useEffect(() => {
+        console.log("User Info: ", user);
+        userInfoPull();
+    }, []);
+
+    const userInfoPull = async() => {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (user) {
+            try{
+                const userDocRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    setUserInfo(userData);
+                    console.log(userInfo);
+                } else {
+                    console.log("No such doument!");
+                }
+            } catch (error) {
+                console.error("Error in fetching the user information: ", error)
+            }
+        }
+    };
 
     const validateDate = (text) => {
         //Regular expression for dd/mm/yyyy
@@ -70,6 +97,10 @@ const Reservation = () => {
                 return `${day}/${month}/${year}`;
             }
             
+                //TRY TO RENAME THE DOC TO THE DOCREF SO THE ORDER DOCREF IS IDENTICAL TO THE DOCREF IN RESERVATIONS
+                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                console.log("docRef: ", docRef);
+
                 const userDocRef = doc(db, "reservations");
 
                 await addDoc(userDocRef, {
@@ -87,7 +118,7 @@ const Reservation = () => {
                 })
 
                 //Inform the user that information is added to the database
-                Alert.alert("Added To Cart");
+                Alert.alert("Reservation Information Added");
                 navigation.navigate("OrderDetails", {userId: userUID})
            
            

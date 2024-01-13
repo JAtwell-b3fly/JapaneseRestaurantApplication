@@ -17,18 +17,24 @@ const Menu = () => {
 
     const navigation = useNavigation();
     const {dispatch, selectedCondiments, selectedDrinks, dishData} = useAppContext();
+    const [lastSelectedType, setLastSelectedType] = useState(null);
 
     const SelectedItemPress = (selectedItem) => {
+        let typeToAdd;
         if (selectedItem.type === "drinks") {
             dispatch({ type: "ADD_DRINK", payload: selectedItem})
+            typeToAdd = "drinks";
         } else {
             dispatch({type: "ADD_DISH", payload: selectedItem});
+            typeToAdd = "dish";
         }
+
         navigation.navigate("Description", {
             dishData,
             userId,
             selectedCondiments,
             selectedDrinks,
+            lastSelectedType: typeToAdd,
         })
     };
 

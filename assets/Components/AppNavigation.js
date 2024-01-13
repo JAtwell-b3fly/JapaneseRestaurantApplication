@@ -54,7 +54,11 @@ const appReducer = (state, action) => {
             }
         case "REMOVE_CONDIMENT":
             return {
-                ...state, selectedCondiments: state.selectedCondiments.filter((condiment) => !(condiment.id === action.payload.id && condiment.quantity <= 1))
+                ...state, 
+                selectedCondiments: state.selectedCondiments.map((condiment) => 
+                condiment.id === action.payload.id
+                ? {...condiment, quantity: Math.max(0, condiment.quantity - 1)}
+                : condiment).filter((condiment) => condiment.quantity > 0)
             };
         case "ADD_DRINK":
             const existingDrink = state.selectedDrinks.find((drink) => drink.id === action.payload.id);
@@ -72,7 +76,11 @@ const appReducer = (state, action) => {
                 }
             }
         case "REMOVE_DRINK":
-            return {...state, selectedDrinks: state.selectedDrinks.filter((drink) => !(drink.id === action.payload.id && drink.quantity <= 1))};
+            return {...state, 
+                selectedDrinks: state.selectedDrinks.map((drink) =>
+                drink.id === action.payload.id
+                ? {...drink, quantity: Math.max(0, drink.quantity - 1)}
+                : drink).filter((drink) => drink.quantity > 0)};
         case "ADD_DISH": 
            const existingDish = state.dishData.find((dish) => dish.id === action.payload.id);
            if (existingDish) {
@@ -89,10 +97,12 @@ const appReducer = (state, action) => {
             }
            }
         case "REMOVE_DISH":
-            return {...state, dishData: state.dishData.filter((dish) => !(dish.id === action.payload.id && dish.quantity <= 1 ))};
+            return {...state, 
+                dishData: state.dishData.map((dish) => dish.id === action.payload.id
+            ? {...dish, quantity: Math.max(0, dish.quantity - 1)} : dish).filter((dish) => dish.quantity > 0)};
         case "RESET_COLLECTIONS":
             console.log("Resetting collections");
-            return {...state, selectedCondiments: [], selectedDrinks: [], dishData: []};
+            return {...state, selectedCondiments: [], selectedDrinks: [], dishData: [], ...payload,};
         default:
             return state;
     }

@@ -130,13 +130,13 @@ const RestaurantCart = () => {
                     main: dishData,
                     condiments: selectedCondiments,
                     drinks: selectedDrinks,
-                    customer: userUID,
                     orderPrice: orderPrice,
+                    orderType: "reservation",
                 })
 
                 //Inform the user that information is added to the database
                 Alert.alert("Added To Cart");
-                navigation.navigate("SeatBooking", {userId: userUID});
+                navigation.navigate("SeatBooking", {userId: userUID, docRef: userDocRef});
             } else {
                 console.error("User Not Found");
             }
@@ -268,7 +268,7 @@ const RestaurantCart = () => {
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.btn_cart} onPress ={() => addToCart()}>
-                    <Text style={styles.btn_cart_text}>Order R500</Text>
+                    <Text style={styles.btn_cart_text}>Order R {orderPrice}</Text>
                 </TouchableOpacity>
             </View>
 

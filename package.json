@@ -23,7 +23,8 @@
     "react-date-picker": "^10.5.1",
     "react-datepicker": "^4.20.0",
     "react-native": "0.72.5",
-    "react-native-picker-select": "^8.1.0"
+    "react-native-picker-select": "^8.1.0",
+    "@expo/webpack-config": "^19.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

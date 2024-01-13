@@ -50,6 +50,9 @@ const OrderDetails = () => {
         }
     };
 
+    //TRY PULLING THE RESERVATION DATA THAT HAS THE SAME DOCREF AS THE ORDER DOCREF, THEY SHOULD BE IDENTICAL
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
     //Get the reservationData from Firebase
     const pullReservationData = async() => {
         if (user) {
@@ -91,17 +94,28 @@ const OrderDetails = () => {
                 const ordersCollectionRef = collection(db, "orders");
                 //const newOrderDocRef = doc(ordersCollectionRef);
 
-                await addDoc(ordersCollectionRef, {
-                reservations: reservations,
-                order: orders,
-                orderDate: getTodaysDate(),
-                orderNumber: CustomerOrderNumber,
-                userId: user.uid,
-})
+                if (orders.orderType === "takeAway") {
+                    await addDoc(ordersCollectionRef, {
+                        order: orders,
+                        orderDate: getTodaysDate(),
+                        orderNumber: CustomerOrderNumber,
+                        userId: user.uid,
+                    })
+                    //Inform the user that information is added to the database
+                    Alert.alert("TakeAway Order Placed");
 
-                //Inform the user that information is added to the database
-                Alert.alert("Added To Cart");
-                navigation.navigate("OrderDetails", {userId: userUID})
+                } else if (orders.orderType === "reservation") {
+                    await addDoc(ordersCollectionRef, {
+                        reservations: reservations,
+                        order: orders,
+                        orderDate: getTodaysDate(),
+                        orderNumber: CustomerOrderNumber,
+                        userId: user.uid,
+                    })
+                    //Inform the user that information is added to the database
+                    Alert.alert("Reservation Placed");
+                }
+
             } else {
                 console.error("User Not Found");
             }
@@ -135,9 +149,10 @@ const OrderDetails = () => {
                 console.error(error.message);
             };
 
+            //Resetting the global states
             try {
                 console.log("State before reset: ", state)
-                dispatch({ type: "RESET_COLLECTIONS"});
+                dispatch({ type: "RESET_COLLECTIONS", payload: null});
                 console.log("State after reset: ", state)
             } catch (error) {
                 console.error("Error in resetting Cart Using Global States", error)
@@ -167,30 +182,38 @@ const OrderDetails = () => {
 
     return(
         <ScrollView style={styles.main}>
+            
             <View style={styles.heading_div}>
                 <Text style={styles.heading}>Order Summary</Text>
             </View>
 
             <ScrollView style={styles.details_div}>
                 <View style={styles.section}>
+
                     <Text style={styles.sectionHeading}>Order Information</Text>
+
                     <Text style={styles.details}>
                         <Text style={styles.header}>Order Number: </Text>
-                    {CustomerOrderNumber}
+                            {CustomerOrderNumber}
                     </Text>
 
                     {Array.isArray(orders.condiments) && orders.condiments.map((condiment, index) => (
                         <View key={`condiment-${index}`} style={styles.items_div}>
+
                             <Text style={styles.details}>
-                                <Text style={styles.header}>Condiments {index + 1}: <Text style={styles.details}>{condiment.name}</Text></Text>
+                                <Text style={styles.header}>Condiments {index + 1}: 
+                                    <Text style={styles.details}>{condiment.name}</Text>
+                                </Text>
                             </Text>
                             
                             <Text style={styles.details}>
                                 <Text style={styles.header}>Price: </Text>
-                            R {condiment.price}
+                                    R {condiment.price}
                             </Text>
+
                             <Text style={styles.details}>
-                                <Text style={styles.header}>Quantity:</Text>{condiment.quantity}
+                                <Text style={styles.header}>Quantity:</Text> 
+                                    {condiment.quantity}
                             </Text>
                         </View>
                     ))}
@@ -199,78 +222,108 @@ const OrderDetails = () => {
                             <View key={`main-${index}`} style={styles.items_div}>
                                 <Text style={styles.details}>
                                     <Text style={styles.header}>Item {index + 1}: </Text>
-                                {mainItem.name}
-                                 </Text>
+                                        {mainItem.name}
+                                </Text>
+
                                 <Text style={styles.details}>
                                     <Text style={styles.header}>Ingredients: </Text>
-                                {mainItem.ingredients}
+                                        {mainItem.ingredients}
                                 </Text>
+
                                 <Text style={styles.details}>
-                                    <Text style={styles.header}>Price: </Text>R {mainItem.price}
+                                    <Text style={styles.header}>Price: </Text>
+                                        R {mainItem.price}
                                 </Text>
+
                                 <Text style={styles.details}>
-                                    <Text style={styles.header}>Quantity:</Text>{mainItem.quantity}
+                                    <Text style={styles.header}>Quantity: </Text>
+                                         {mainItem.quantity}
                                 </Text>
                             </View>
                         ))}
 
                         {Array.isArray(orders.drinks) && orders.drinks.map((drink, index) => (
                             <View key={`drink-${index}`} style={styles.items_div}>
-                            <Text style={styles.details}>
-                                <Text style={styles.header}>Drinks {index + 1}: <Text style={styles.details}>{drink.name}</Text></Text>
-                            </Text>
+                                <Text style={styles.details}>
+                                    <Text style={styles.header}>Drinks {index + 1}: 
+                                        <Text style={styles.details}>{drink.name}</Text>
+                                    </Text>
+                                </Text>
                             
-                            <Text style={styles.details}>
-                                <Text style={styles.header}>Price: </Text>
-                           R {drink.price}
-                            </Text>
-                            <Text style={styles.details}>
-                            <Text style={styles.header}>Quantity:</Text>{drink.quantity}
-                            </Text>
+                                <Text style={styles.details}>
+                                    <Text style={styles.header}>Price: </Text>
+                                        R {drink.price}
+                                </Text>
+
+                                <Text style={styles.details}>
+                                    <Text style={styles.header}>Quantity:</Text>
+                                     {drink.quantity}
+                                </Text>
                             </View>
                         ))}
 
                             <Text style={styles.details}>
-                                <Text style={styles.header}>Total Order Price: <Text style={styles.details}>R {orders.orderPrice}</Text></Text>
+                                <Text style={styles.header}>Total Order Price: 
+                                    <Text style={styles.details}>R {orders.orderPrice}</Text>
+                                </Text>
                             </Text>
                 </View>
 
                 {!isEmpty(reservations) && (
                     <View style={styles.section}>
                         <Text style={styles.sectionHeading}>Reservation Information</Text>
-                        {/* Display Reservation Details */}
-                    <View style={styles.items_div}>
-                    <Text style={styles.details}>
-                    <Text style={styles.header}>Agree To Terms: </Text>{" "}
-                    {reservations.AgreeToTerms ? "Yes" : "No"}
-                    </Text>
-                    <Text style={styles.details}>
-                    <Text style={styles.header}>Customer: </Text> {reservations.Name}
-                    </Text>
-                    <Text style={styles.details}>
-                    <Text style={styles.header}>Date: </Text> {reservations.Date}
-                    </Text>
-                    <Text style={styles.details}>
-                    <Text style={styles.header}>Email: </Text> {reservations.Email}
-                    </Text>
-                    <Text style={styles.details}>
-                    <Text style={styles.header}>Number Of Guests: </Text> {reservations.Number_Of_Guests}
-                    </Text>
-                    <Text style={styles.details}>
-                    <Text style={styles.header}>Occassion: </Text> {reservations.Occassion}
-                    </Text>
-                    <Text style={styles.details}>
-                    <Text style={styles.header}>Phone Number: </Text> {reservations.Phone_Number}
-                    </Text>
-                    <Text style={styles.details}>
-                    <Text style={styles.header}>Special Requests: </Text> {reservations.Special_Requests}
-                    </Text>
-                    <Text style={styles.details}>
-                    <Text style={styles.header}>Table Selected: </Text> {reservations.Table}
-                    </Text>
-                    <Text style={styles.details}>
-                    <Text style={styles.header}>Reservation Made: </Text> {reservations.reservationMade}
-                    </Text>
+                        
+                        <View style={styles.items_div}>
+
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Agree To Terms: </Text>{" "}
+                                {reservations.AgreeToTerms ? "Yes" : "No"}
+                            </Text>
+
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Customer: </Text>
+                                 {reservations.Name}
+                            </Text>
+
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Date: </Text>
+                                 {reservations.Date}
+                            </Text>
+
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Email: </Text>
+                                 {reservations.Email}
+                            </Text>
+
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Number Of Guests: </Text>
+                                 {reservations.Number_Of_Guests}
+                            </Text>
+
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Occassion: </Text>
+                                 {reservations.Occassion}
+                            </Text>
+
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Phone Number: </Text>
+                                 {reservations.Phone_Number}
+                            </Text>
+
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Special Requests: </Text>
+                                 {reservations.Special_Requests}
+                            </Text>
+
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Table Selected: </Text>
+                                 {reservations.Table}
+                            </Text>
+
+                            <Text style={styles.details}>
+                                <Text style={styles.header}>Reservation Made: </Text>
+                                 {reservations.reservationMade}
+                            </Text>
                     </View>
                      </View>
                 )}
