@@ -73,8 +73,13 @@ const Condiments = () => {
     }
 
     const handleAddCondimentPress = (selectedCondiments) => {
+        navigation.navigate("OrderCart", { dishData, selectedCondiments, userId, selectedDrinks});
+    };
+
+    const handleAddDrinksPress = (selectedCondiments) => {
         navigation.navigate("Drinks", { dishData, selectedCondiments, userId, selectedDrinks});
     };
+
 
     const handleBackNavPress = () => {
         navigation.navigate("Description", {userId});
@@ -106,7 +111,7 @@ const Condiments = () => {
 
                     <View style={styles.condiment_text}>
                         <Text style={styles.description}>{condiment.name}</Text>
-                        <Text style={styles.price}>{condiment.price}</Text>
+                        <Text style={styles.price}>R {condiment.price}</Text>
                     </View>
 
                     <TouchableOpacity key={condiment.id} style={[styles.add_btn, addState[condiment.id] === "add_clicked" && styles.add_btn_clicked]} onPress={() => handleAddCondiment(condiment)}>
@@ -122,6 +127,10 @@ const Condiments = () => {
             <View>
                 <TouchableOpacity style={styles.btn_condiments} onPress={() => handleAddCondimentPress(selectedCondiments)}>
                     <Text style={styles.btn_condiments_text}>Add Condiments</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.btn_cart} onPress={() => handleAddDrinksPress(selectedCondiments)}>
+                    <Text style={styles.btn_cart_text}>Add Drinks</Text>
                 </TouchableOpacity>
             </View>
 
@@ -155,16 +164,16 @@ const styles = StyleSheet.create({
         backgroundColor: "black",
     },
     dish: {
-        height: 300,
+        height: 200,
         width: "100%"
     },
     screen_name: {
         color: "white",
-        fontSize: 32,
+        fontSize: 25,
         fontWeight: "bold",
         textAlign: "center",
-        marginTop: 30,
-        marginBottom: 25,
+        marginTop: 15,
+        marginBottom: 20,
     },
     description: {
         color: "white",
@@ -206,8 +215,8 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         padding: 8,
         marginLeft: 80,
-        marginTop: 10,
-        marginBottom: 25,
+        //marginTop: 10,
+        marginBottom: 15,
     },
     btn_cart_text: {
         color: "white",
@@ -224,8 +233,8 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         padding: 8,
         marginLeft: 80,
-        marginTop: 10,
-        marginBottom: 25,
+        marginTop: 15,
+        marginBottom: 15,
     },
     btn_condiments_text: {
         color: "white",

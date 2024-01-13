@@ -7,7 +7,7 @@ const SeatBooking = () => {
 
     const navigation = useNavigation();
     const route = useRoute();
-    const { userId } = route.params;
+    const { userId, docRef } = route.params;
     
     const [selectedTable, setSelectedTable] = useState("");
     const [selectedTables, setSelectedTables] = useState([]);
@@ -48,7 +48,7 @@ const SeatBooking = () => {
         Alert.alert(`${selectedTable} successfully booked`);
         navigation.navigate("Reservation", {
             userId, 
-            selectedTable});
+            selectedTable, docRef});
     }
 
     return(
@@ -59,7 +59,7 @@ const SeatBooking = () => {
                     <Text style={styles.top_btn_text}>Order Delivery</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.restaurant_btn} onPress ={() => navigation.navigate("RestaurantCart")}>
+                <TouchableOpacity style={styles.restaurant_btn} onPress ={() => navigation.navigate("RestaurantCart", {userId})}>
                     <Text style={styles.top_btn_text}>In The Restaurant</Text>
                 </TouchableOpacity>
             </View>
