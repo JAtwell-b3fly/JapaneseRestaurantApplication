@@ -61,6 +61,25 @@ const OrderHistory = () =>{
             }
     };
 
+    const formatMonth = (dateString) => {
+        const [month, day, year] = dateString.split("/");
+        const monthAbbreviation = getMonthAbbreviation(parse(month, 10));
+
+        return `${monthAbbreviation}`
+    }
+
+    const formatDay = (dateString) => {
+        const [month, day, year] = dateString.split("/");
+        const monthAbbreviation = getMonthAbbreviation(parse(month, 10));
+
+        return `${day}`
+    }
+
+    const getMonthAbbreviation = (month) => {
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return monthNames[month - 1];
+    }
+
     return(
         <View style={styles.main}>
 
@@ -85,16 +104,38 @@ const OrderHistory = () =>{
                 <Image style={styles.search_icon} source={require("../images/icons/search.png")} />
             </TouchableOpacity>
 
-            <ScrollView>
+            <ScrollView horizontal>
+                {orders.map((order) => (
+                    <View style={styles.container} key={order.id}>
+                    <View style={styles.orderBox}>
+                        <View style={styles.dateBox}>
+                            <Text style={styles.date_month}>{formatMonth(order.orderDate) || "OCT"}</Text>
+                            <Text style={styles.date_day}>{formatDay(order.orderDate) || "26"}</Text>
+                        </View>
 
-                {/*{orders.map((order) => (
-                
-                //))*/}
-                <View style={styles.orderBox}>
-                    <View style={styles.dateBox}>
-                        <Text style={styles.date}>OCT 26</Text>
+                        <View style={styles.descriptionBox}>
+                            {order.order.main && order.order.main.length > 0 ? (
+                                order.order.main.map((mainDish) => (
+                                    <Text style={styles.dish_name} key={mainDish.id}>{mainDish.name || "Spicy Ramen Noodles"}</Text>
+                                ))
+                            ): (
+                                    <Text style={styles.dish_name} key={mainDish.id}>{"No Main Dish"}</Text>
+                            )}
+                            
+                            <View style={{flexDirection: "row"}}>
+                                <Text style={styles.reference_nr}>#{order.orderNumber || "#OR65168"}</Text>
+                                <Text style={styles.typeTime}>.{order.order.orderType|| "Delivery"}.</Text>
+                                <Text style={styles.typeTime}>{order.order.orderDate|| "12:40"}</Text>
+                            </View>
+
+                        </View>
+
+                        <View style={styles.drilldownBox}>
+                            <Text style={styles.arrow}>></Text>
+                        </View>
                     </View>
                 </View>
+                ))}
             </ScrollView>
 
             <TouchableOpacity style={styles.btn_history} onPress={() => navigation.navigate("Menu")}>
@@ -109,19 +150,82 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "black",
     },
-    date: {
-        color: "white",
-        position: "relative",
+    container: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+      },
+      orderBox: {
+        backgroundColor: 'rgb(69, 71, 75)',
+        height: "auto",
+        width: 390,
+        margin: 10,
         zIndex: 1,
-    },
-    orderBox: {
-        backgroundColor: "yellow",
-        top: 25,
-        height: 25,
-        width: 25,
-        position: "absolute",
+        flex: 1,
+        flexDirection: 'row',
+        padding: 10,
+      },
+      dateBox: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: -25,
+        height:"auto",
+        marginRight: 15
+      },
+      descriptionBox: {
+        textAlign: "left",
+        height: "auto",
+        width: "60%",
+        justifyContent: "center",
+        marginRight: 5,
+      },
+      drilldownBox: {
+        flex: 1,
+        height: "auto",
+        justifyContent: "center",
+        marginLeft: 40,
+        textAlign: "right"
+      },
+      date_month: {
+        color: 'rgb(182, 187, 196)',
         zIndex: 1,
-    },
+        fontSize: 18,
+      },
+      date_day: {
+        color: 'rgb(182, 187, 196)',
+        zIndex: 1,
+        fontWeight: "bold",
+        fontSize: 30,
+      },
+      arrow: {
+        color: 'white',
+        zIndex: 1,
+        fontWeight: "300",
+        fontSize: 60,
+      },
+      dish_name: {
+        color: 'orange',
+        zIndex: 1,
+        fontWeight: "bold",
+        fontSize: 20,
+        paddingBottom: 5,
+      },
+      reference_nr: {
+        color: 'white',
+        zIndex: 1,
+        fontWeight: "400",
+        fontSize: 18,
+      },
+      typeTime: {
+        color: 'white',
+        zIndex: 1,
+        fontWeight: "100",
+        fontSize: 15,
+        marginLeft: 10,
+        paddingTop:2,
+      },
     heading: {
         color: "white",
         fontSize: 30,
