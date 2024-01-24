@@ -19,11 +19,9 @@ const OrderDetails = () => {
     const userUID = user.uid;
 
     const [orders, setOrders] = useState([]);
-    const [reservations, setReservations] = useState([]);
 
     useEffect (() => {
         pullOrderData();
-        pullReservationData();
     }, []);
 
     useEffect(() => {
@@ -46,30 +44,6 @@ const OrderDetails = () => {
                 }
             } catch (error) {
                 console.error("Error in fetching the cart information: ", error)
-            }
-        }
-    };
-
-    //TRY PULLING THE RESERVATION DATA THAT HAS THE SAME DOCREF AS THE ORDER DOCREF, THEY SHOULD BE IDENTICAL
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-    //Get the reservationData from Firebase
-    const pullReservationData = async() => {
-        if (user) {
-            try{
-                const userDocRef = doc(db, "reservations", user.uid);
-                const docSnap = await getDoc(userDocRef);
-
-                if (docSnap.exists()) {
-                    const reservationsData = docSnap.data();
-                    setReservations(reservationsData);
-                    console.log("Reservation Data: ",reservations);
-                } else {
-                    setReservations([]);
-                    console.log("No such document!");
-                }
-            } catch (error) {
-                console.error("Error in fetching the reservation information: ", error)
             }
         }
     };
@@ -106,7 +80,6 @@ const OrderDetails = () => {
 
                 } else if (orders.orderType === "reservation") {
                     await addDoc(ordersCollectionRef, {
-                        reservations: reservations,
                         order: orders,
                         orderDate: getTodaysDate(),
                         orderNumber: CustomerOrderNumber,
@@ -269,7 +242,6 @@ const OrderDetails = () => {
                             </Text>
                 </View>
 
-                {!isEmpty(reservations) && (
                     <View style={styles.section}>
                         <Text style={styles.sectionHeading}>Reservation Information</Text>
                         
@@ -277,56 +249,55 @@ const OrderDetails = () => {
 
                             <Text style={styles.details}>
                                 <Text style={styles.header}>Agree To Terms: </Text>{" "}
-                                {reservations.AgreeToTerms ? "Yes" : "No"}
+                                {orders.AgreeToTerms ? "Yes" : "No"}
                             </Text>
 
                             <Text style={styles.details}>
                                 <Text style={styles.header}>Customer: </Text>
-                                 {reservations.Name}
+                                 {userInfo.fullName || "userName"}
                             </Text>
 
                             <Text style={styles.details}>
                                 <Text style={styles.header}>Date: </Text>
-                                 {reservations.Date}
+                                 {orders.Date}
                             </Text>
 
                             <Text style={styles.details}>
                                 <Text style={styles.header}>Email: </Text>
-                                 {reservations.Email}
+                                {userInfo.email || "email"}
                             </Text>
 
                             <Text style={styles.details}>
                                 <Text style={styles.header}>Number Of Guests: </Text>
-                                 {reservations.Number_Of_Guests}
+                                 {orders.Number_Of_Guests}
                             </Text>
 
                             <Text style={styles.details}>
                                 <Text style={styles.header}>Occassion: </Text>
-                                 {reservations.Occassion}
+                                 {orders.Occassion}
                             </Text>
 
                             <Text style={styles.details}>
                                 <Text style={styles.header}>Phone Number: </Text>
-                                 {reservations.Phone_Number}
+                                 {userInfo.number}
                             </Text>
 
                             <Text style={styles.details}>
                                 <Text style={styles.header}>Special Requests: </Text>
-                                 {reservations.Special_Requests}
+                                 {orders.Special_Requests}
                             </Text>
 
                             <Text style={styles.details}>
                                 <Text style={styles.header}>Table Selected: </Text>
-                                 {reservations.Table}
+                                 {orders.Table}
                             </Text>
 
                             <Text style={styles.details}>
                                 <Text style={styles.header}>Reservation Made: </Text>
-                                 {reservations.reservationMade}
+                                 {orders.reservationMade}
                             </Text>
                     </View>
                      </View>
-                )}
                 
 
             </ScrollView>

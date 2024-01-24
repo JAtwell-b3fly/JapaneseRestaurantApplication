@@ -4,6 +4,7 @@ import { getAuth } from "firebase/auth";
 import {where, query, collection, getDocs} from "firebase/firestore";
 import {View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image, FlatList} from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { EvilIcons } from '@expo/vector-icons';
 
 const OrderHistory = () =>{
 
@@ -62,17 +63,17 @@ const OrderHistory = () =>{
     };
 
     const formatMonth = (dateString) => {
-        const [month, day, year] = dateString.split("/");
-        const monthAbbreviation = getMonthAbbreviation(parse(month, 10));
+        //const [month, day, year] = dateString.split("/");
+        //const monthAbbreviation = getMonthAbbreviation(parse(month, 10));
 
-        return `${monthAbbreviation}`
+        //return `${monthAbbreviation}`
     }
 
     const formatDay = (dateString) => {
-        const [month, day, year] = dateString.split("/");
-        const monthAbbreviation = getMonthAbbreviation(parse(month, 10));
+        //const [month, day, year] = dateString.split("/");
+        //const monthAbbreviation = getMonthAbbreviation(parse(month, 10));
 
-        return `${day}`
+        //return `${day}`
     }
 
     const getMonthAbbreviation = (month) => {
@@ -104,7 +105,7 @@ const OrderHistory = () =>{
                 <Image style={styles.search_icon} source={require("../images/icons/search.png")} />
             </TouchableOpacity>
 
-            <ScrollView horizontal>
+            <ScrollView vertical>
                 {orders.map((order) => (
                     <View style={styles.container} key={order.id}>
                     <View style={styles.orderBox}>
@@ -131,7 +132,7 @@ const OrderHistory = () =>{
                         </View>
 
                         <View style={styles.drilldownBox}>
-                            <Text style={styles.arrow}>></Text>
+                            <EvilIcons name="chevron-down" color="white" style={styles.arrow} />
                         </View>
                     </View>
                 </View>
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
         color: 'white',
         zIndex: 1,
         fontWeight: "300",
-        fontSize: 60,
+        fontSize: 50,
       },
       dish_name: {
         color: 'orange',
