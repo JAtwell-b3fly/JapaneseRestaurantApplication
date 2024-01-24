@@ -132,7 +132,7 @@ const OrderCart = () => {
                     condiments: selectedCondiments,
                     drinks: selectedDrinks,
                     orderPrice: orderPrice,
-                    orderType: "takeAway",
+                    orderType: "TakeAway",
                 })
 
                 //Inform the user that information is added to the database

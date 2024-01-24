@@ -131,7 +131,7 @@ const RestaurantCart = () => {
                     condiments: selectedCondiments,
                     drinks: selectedDrinks,
                     orderPrice: orderPrice,
-                    orderType: "reservation",
+                    orderType: "Reservation",
                 })
 
                 //Inform the user that information is added to the database

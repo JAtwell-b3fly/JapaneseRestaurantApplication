@@ -2,7 +2,7 @@ import {React, useState, useEffect} from "react";
 import { View, Image, StyleSheet, Text, TouchableOpacity, ScrollView, TextInput, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import {db} from "../config/firebase";
-import {doc, setDoc, addDoc, getDoc} from "firebase/firestore";
+import {doc, setDoc, addDoc, getDoc, updateDoc} from "firebase/firestore";
 import { useRoute } from "@react-navigation/native";
 import { Picker } from "@react-native-picker/picker";
 import { getAuth } from "firebase/auth";
@@ -32,11 +32,6 @@ const Reservation = () => {
     const [specialRequests, setSpecialRequests] = useState("");
     const [occassion, setOccassion] = useState("Casual Dining");
 
-    useEffect(() => {
-        console.log("User Info: ", user);
-        userInfoPull();
-    }, []);
-
     const userInfoPull = async() => {
         const auth = getAuth();
         const user = auth.currentUser;
@@ -58,7 +53,7 @@ const Reservation = () => {
         }
     };
 
-    const validateDate = (text) => {
+    /*const validateDate = (text) => {
         //Regular expression for dd/mm/yyyy
         const dataRegex = /^[0-9/]*$/;
 
@@ -76,7 +71,7 @@ const Reservation = () => {
 
     const validateNumberOfGuests = (text) => {
             setNumberOfGuests(text);
-    }
+    }*/
 
     const addToReservations = async() => {
 
@@ -97,16 +92,9 @@ const Reservation = () => {
                 return `${day}/${month}/${year}`;
             }
             
-                //TRY TO RENAME THE DOC TO THE DOCREF SO THE ORDER DOCREF IS IDENTICAL TO THE DOCREF IN RESERVATIONS
-                //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                console.log("docRef: ", docRef);
+                const userDocRef = doc(db, "cart", user.uid);
 
-                const userDocRef = doc(db, "reservations");
-
-                await addDoc(userDocRef, {
-                    Name: name,
-                    Email: email,
-                    Phone_Number: cellNumber,
+                await updateDoc(userDocRef, {
                     Number_Of_Guests: numberOfGuests,
                     Special_Requests: specialRequests,
                     Date: date,
@@ -120,7 +108,6 @@ const Reservation = () => {
                 //Inform the user that information is added to the database
                 Alert.alert("Reservation Information Added");
                 navigation.navigate("OrderDetails", {userId: userUID})
-           
            
     } catch (error) {
         console.error(error.message);
