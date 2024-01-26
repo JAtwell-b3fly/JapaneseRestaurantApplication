@@ -18,6 +18,13 @@ const OrderHistory = () =>{
     const [searchTerm, setSearchTerm] = useState("");
     const [searchedItem, setSearchedItem] = useState([]);
 
+    const [showFullOrder, setShowFullOrder] = useState(false);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
+
+    const toggleFullOrder = (orderId) => {
+        setSelectedOrderId(selectedOrderId === orderId ? null : orderId);
+    }
+
     const handleSearch = () => {
         const filteredOrders = orders.filter((order) =>
           order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase())
@@ -124,17 +131,72 @@ const OrderHistory = () =>{
                             )}
                             
                             <View style={{flexDirection: "row"}}>
-                                <Text style={styles.reference_nr}>#{order.orderNumber || "#OR65168"}</Text>
-                                <Text style={styles.typeTime}>.{order.order.orderType|| "Delivery"}.</Text>
-                                <Text style={styles.typeTime}>{order.order.orderDate|| "12:40"}</Text>
+                                <Text style={styles.reference_nr}>#{order.orderNumber}</Text>
+                                <Text style={styles.typeTime}>.{order.order.orderType}.</Text>
+                                <Text style={styles.typeTime}>R {order.order.orderPrice}</Text>
                             </View>
 
                         </View>
 
                         <View style={styles.drilldownBox}>
-                            <EvilIcons name="chevron-down" color="white" style={styles.arrow} />
+                            <TouchableOpacity onPress={() => toggleFullOrder(order.id)}>
+                                <EvilIcons name="chevron-down" color="white" style={styles.arrow} />
+                            </TouchableOpacity>
                         </View>
                     </View>
+
+                    {selectedOrderId === order.id && (
+                        <View style={styles.fullOrderDetails}>
+                            <View style={styles.typeSections}>
+                                <Text style={styles.dishDetailsTitle}>Dishes Ordered</Text>
+                                {order.order.main && order.order.main.length > 0 ? (
+                                    order.order.main.map((mainDish) => (
+                                    <View style={styles.dishDetails} key={mainDish.id}>
+                                        <Text style={styles.dish_nameDetails}>- {mainDish.name}</Text>
+                                        <Text style={styles.individualPrice}>R {mainDish.price}</Text>
+                                    </View>
+                                    ))
+                                ): (
+                                    <Text style={styles.individualPrice}>No Main Dishes Ordered</Text>
+                                )}
+                            </View>
+
+                            <View style={styles.typeSections}>
+                                <Text style={styles.dishDetailsTitle}>Condiments Ordered</Text>
+                                {order.order.condiments && order.order.condiments.length > 0 ? (
+                                    order.order.condiments.map((condiment) => (
+                                        <View style={styles.dishDetails}>
+                                            <Text style={styles.dish_nameDetails}>- {condiment.name}</Text>
+                                            <Text style={styles.individualPrice}>R {condiment.price}</Text>
+                                        </View>
+                                    ))
+                                ) : (
+                                    <Text style={styles.individualPrice}>No Condiments Ordered</Text>
+                                )}
+                                
+                            </View>
+
+                            <View style={styles.typeSections}>
+                                <Text style={styles.dishDetailsTitle}>Drinks Ordered</Text>
+                                {order.order.drinks && order.order.drinks.length > 0 ? (
+                                    order.order.drinks.map((drink) => (
+                                        <View style={styles.dishDetails}>
+                                            <Text style={styles.dish_nameDetails}>- {drink.name}</Text>
+                                            <Text style={styles.individualPrice}>R {drink.price}</Text>
+                                        </View>
+                                    ))
+                                ):(
+                                    <Text style={styles.individualPrice}>No Drinks Ordered</Text>
+                                )}
+                                
+                            </View>
+
+                            <View style={styles.priceDetails}>
+                                <Text style={styles.detailsPriceText}>Total Price: </Text>
+                                <Text style={styles.detailsPrice}>R {order.order.orderPrice} </Text>
+                            </View>
+                        </View>
+                    )}
                 </View>
                 ))}
             </ScrollView>
@@ -153,9 +215,69 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
+      },
+      fullOrderDetails: {
+        backgroundColor: "rgba(0,0,0)",
+        marginTop: 2,
+        height: "auto",
+        width: 390,
+        zIndex: 1,
+        flex: 1,
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        marginLeft: 10,
+      },
+      typeSections: {
+        justifyContent: "center",
+        borderTopColor: "orange",
+        borderBottomColor: "orange",
+        borderWidth: 1,
+        width: 390,
+        padding: 5,
+      },
+      dishDetailsTitle: {
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 18,
+      },
+      detailsPriceText: {
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 18,
+        marginTop: 5,
+      },
+      detailsPrice: {
+        color: "orange",
+        fontWeight: "bold",
+        fontSize: 24,
+      },
+      dishDetails: {
+        flex: 1,
+        flexDirection: "row",
+      },
+      individualPrice: {
+        color: "white",
+        fontWeight: "300",
+        fontSize: 16,
+        marginLeft: 50
+      },
+      dish_nameDetails: {
+        color: 'orange',
+        zIndex: 1,
+        fontWeight: "800",
+        fontSize: 16,
+        paddingBottom: 5,
+        width: 180,
+      },
+      priceDetails: {
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        textAlign: "right",
+        marginTop: 10,
+        marginLeft: 200,
       },
       orderBox: {
         backgroundColor: 'rgb(69, 71, 75)',
